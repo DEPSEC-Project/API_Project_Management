@@ -1,0 +1,8 @@
+flask
+flask-limiter
+Flask-SQLAlchemy
+Flask-JWT-Extended
+pytest
+dotenv
+requests
+python-semantic-release

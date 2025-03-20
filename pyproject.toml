@@ -1,0 +1,20 @@
+[project]
+name = "TemplateAPI" # achanger
+description = "Template d'API pour le projet DEPSEC" # achanger
+
+[tool.semantic_release]
+version_variable = ["app/__init__.py:__version__"]
+branch = "master"
+changelog_file = "CHANGELOG.md"
+commit_message = "chore(release): bump version to {version}"
+version_source = "commit"
+
+upload_to_pypi = false # on upload pas nos packages
+
+
+tag_format = "v{version}" #tag git automatique pour semantic-release
+
+changelog_sections = ["Features", "Bug Fixes", "Documentation", "Tests","CI/CD"]
+upload_to_release = true # release auto sur github
+changelog_format = "- {message} ([{commit}](https://github.com/DEPSEC-Project/TemplateAPI/commit/{commit}))"
+

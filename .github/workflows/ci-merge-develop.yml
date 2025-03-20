@@ -1,0 +1,47 @@
+name: Template Industrialisation workflow pour les merges de feature/* vers develop (Sert principalement pour les tests)
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "feature/**" ]
+  pull_request_target:
+    branches: [ "develop" ]  
+  workflow_dispatch:
+  
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest 
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10","3.11"]
+    steps:
+      - name: Checkout le code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }} # test de plusieurs versions python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}  
+
+      - name: Instalation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt*
+
+      - name: Définir les variables d'environnement
+        run: |
+          echo "FLASK_ENV=development" >> $GITHUB_ENV
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "TEST_DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" >> $GITHUB_ENV
+          echo "FLASK_PORT=5000" >> $GITHUB_ENV
+
+      - name: Test des fonctions de l'application
+        run: |
+          python -m pytest test/test_app.py
+
+      - name: Test des endpoints de l'application
+        run : |
+          python -m pytest test/test_endpoints.py
+      
+

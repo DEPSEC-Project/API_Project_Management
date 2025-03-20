@@ -1,0 +1,53 @@
+name: Workflow sur le master
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write  # pour release et tag
+  issues: write    # pour commenter les issues
+  pull-requests: write  # pour gérer les PR
+
+jobs:
+  workflow_push_on_main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Vérifier s'il s'agit du commit initial
+        id: check_initial_commit
+        run: |
+          if [ $(git rev-list --count HEAD) -eq 1 ]; then
+            echo "is_initial_commit=true" >> $GITHUB_ENV
+          else
+            echo "is_initial_commit=false" >> $GITHUB_ENV
+          fi
+
+      - name: Modifier le message du commit initial
+        if: env.is_initial_commit == 'true'
+        run: |
+          git config user.name "CI GITHUB"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git commit --amend -m "chore: initial commit"
+          git push --force
+
+      - name: Créer un tag pour le commit initial
+        if: env.is_initial_commit == 'true'
+        run: |
+          git tag v0.1.0
+          git push origin v0.1.0
+
+      - name: Créer la branche develop
+        if: env.is_initial_commit == 'true'
+        run: |
+          git config --global user.name "CI GITHUB"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git checkout -b develop
+          git push origin develop
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
