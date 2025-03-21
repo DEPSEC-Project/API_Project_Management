@@ -1,6 +1,6 @@
 from flask import Blueprint, json, request, jsonify
 from flask_jwt_extended import create_access_token
-from app.extensions import db
+#from app.extensions import db
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import re
