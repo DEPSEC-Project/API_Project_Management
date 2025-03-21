@@ -13,8 +13,22 @@ limiter = Limiter(get_remote_address, default_limits=["5 per minute"])
 
 # ---------- Phase de test avant la BDD (comme si test.json était ce qu'on récupérait de la BDD) ------------- #
 
-with open('test.json', 'r') as project:
-    projects = json.load(project)
+projects = [
+    {
+        "id":1,
+        "titre":"Gestion des projets",
+        "auteur":"Solayman",
+        "status":"Accept",
+        "SBOM":"Recup"
+    },
+    {
+        "id":2,
+        "titre":"Gestion de BDD",
+        "auteur":"Pierrot la pinto de la mañana",
+        "status":"Refuse",
+        "SBOM":"Waiting"
+    }
+]
 
 def return_project(proj):
     for p in projects:
