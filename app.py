@@ -3,4 +3,5 @@ from app import create_app # import de la fonction create_app du fichier app/__
 app = create_app()
 
 if __name__ == "__main__": #lancement de l'app 
-    app.run(debug=app.config.get("DEBUG"))
+    app.run(host="0.0.0.0", port=5000, debug=True)
+    # app.run(debug=app.config.get("DEBUG"))
