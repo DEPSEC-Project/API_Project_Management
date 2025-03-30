@@ -39,15 +39,27 @@ def return_all_proj():
 
 
 def return_project(proj):
-    for p in projects:
-        if proj in p.values():
-            return p
-        
-def is_project(title):
-    for p in projects:
-        if title in p.values():
-            return True
+   for p in projects:
+       if proj in p.values():
+           return p
+      
 
+
+def add_dico(dico):
+
+    for d in projects:
+        if d["titre"] == dico["titre"]:
+            return jsonify({"error": f"Le nom de projet {d['titre']} existe deja !"}), 400
+        
+    # trouve le + grand id
+    max_id = max([elem['id'] for elem in projects]) if projects else 0
+    
+    dico['id'] = max_id + 1
+    projects.append(dico)
+    
+    return return_all_proj()
+    #save_json(file_path, data)
+    #return jsonify(load_json(file_path)), 200
 
 # ------------------------------------------------------------------------------------------------------------ #
 
@@ -57,9 +69,12 @@ def get_projects():
     if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
         return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
-    data = request.json
-    if request.method == 'GET':
-        return jsonify({"Projects":data}), 200
+
+    #data = request.get_json()
+
+
+    return return_all_proj(), 200
+    #return jsonify({"Projects":data.get('titre')}), 200
 
 
 @projets_bp.route('/', methods=['POST'])
@@ -67,26 +82,43 @@ def add_project():
     if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
         return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
-    data = request.json
 
-    try :
-        id = data["id"]
-        titre = data["titre"]
-        auteur = data["auteur"]
-        status = data["status"]
-        sbom = data["SBOM"]
+    data = request.get_json()
 
-        format = {
-            "id":id,
-            "titre":titre,
-            "auteur":auteur,
-            "status":status,
-            "SBOM":sbom
-        }
+    if not data :
+        return jsonify({"error": "Le fomat de vos donnees n'est pas bon !!"}), 400
 
-        if request.method == 'POST':
-            if is_project(titre) != True and isinstance(id, int) and isinstance(auteur, str) and status in ["Accept","Refuse"] and sbom in ["Recup","Waiting"]:
-                return jsonify(format), 200
+    if data.get("titre") and data.get("auteur") and data.get("status") and data.get("SBOM"):
+        titre = data.get("titre")
+        auteur = data.get("auteur")
+        status = data.get("status")
+        sbom = data.get("SBOM")
+
+        if isinstance(auteur, str) and status in ["Accept","Refuse"] and sbom in ["Recup","Waiting"]:
+            format = {
+                "id":0,
+                "titre":titre,
+                "auteur":auteur,
+                "status":status,
+                "SBOM":sbom
+            }
+            return add_dico(format)
+        else :
+            return jsonify({'error': 'Parametres aux mauvais formats !'}), 400
+    else :
+        return jsonify({'error': 'Parametres manquants'}), 400
+       
         
-    except:
-        return jsonify({"Format de votre requête invalide": "Format de vos valeurs invalide"}), 203
+
+
+@projets_bp.route('/projets', methods=['POST'])
+@limiter.limit("5 per minute") #exemple pour limiter le nombre de requetes
+def tutu():
+   if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
+       return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
+
+
+   data = request.json
+
+
+   return jsonify({"msg": "blabla"}), 401
