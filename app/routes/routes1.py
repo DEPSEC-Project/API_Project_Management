@@ -39,6 +39,7 @@ def return_all_proj():
 
 
 def return_project(proj):
+<<<<<<< HEAD
    for p in projects:
        if proj in p.values():
            return p
@@ -68,6 +69,17 @@ def is_project(title):
            return True
 
 >>>>>>> 3bf328f (fix/test765765)
+=======
+    for p in projects:
+        if proj in p.values():
+            return p
+        
+def is_project(title):
+    for p in projects:
+        if title in p.values():
+            return True
+
+>>>>>>> 555395394ab9a66b4b524023c9cf7b970a0bf617
 
 # ------------------------------------------------------------------------------------------------------------ #
 
@@ -77,6 +89,7 @@ def get_projects():
     if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
         return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
+<<<<<<< HEAD
 
    #data = request.get_json()
 
@@ -87,6 +100,11 @@ def get_projects():
    return return_all_proj()
 >>>>>>> 3bf328f (fix/test765765)
    #return jsonify({"Projects":data.get('titre')}), 200
+=======
+    data = request.json
+    if request.method == 'GET':
+        return jsonify({"Projects":data}), 200
+>>>>>>> 555395394ab9a66b4b524023c9cf7b970a0bf617
 
 
 @projets_bp.route('/', methods=['POST'])
@@ -94,7 +112,9 @@ def add_project():
     if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
         return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
+    data = request.json
 
+<<<<<<< HEAD
 <<<<<<< HEAD
    data = request.get_json()
    
@@ -106,22 +126,28 @@ def add_project():
         auteur = data.get("auteur")
         status = data.get("status")
         sbom = data.get("SBOM")
+=======
+    try :
+        id = data["id"]
+        titre = data["titre"]
+        auteur = data["auteur"]
+        status = data["status"]
+        sbom = data["SBOM"]
+>>>>>>> 555395394ab9a66b4b524023c9cf7b970a0bf617
 
-        if isinstance(auteur, str) and status in ["Accept","Refuse"] and sbom in ["Recup","Waiting"]:
-            format = {
-                "id":0,
-                "titre":titre,
-                "auteur":auteur,
-                "status":status,
-                "SBOM":sbom
-            }
-            return add_dico(format)
-        else :
-            return jsonify({'error': 'Parametres aux mauvais formats !'}), 400
-   else :
-        return jsonify({'error': 'Parametres manquants'}), 400
-       
+        format = {
+            "id":id,
+            "titre":titre,
+            "auteur":auteur,
+            "status":status,
+            "SBOM":sbom
+        }
+
+        if request.method == 'POST':
+            if is_project(titre) != True and isinstance(id, int) and isinstance(auteur, str) and status in ["Accept","Refuse"] and sbom in ["Recup","Waiting"]:
+                return jsonify(format), 200
         
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 
@@ -172,3 +198,7 @@ def tutu():
     except:
         return jsonify({"Format de votre requête invalide": "Format de vos valeurs invalide"}), 203
 >>>>>>> 5553953 (fix/indentation)
+=======
+    except:
+        return jsonify({"Format de votre requête invalide": "Format de vos valeurs invalide"}), 203
+>>>>>>> 555395394ab9a66b4b524023c9cf7b970a0bf617
