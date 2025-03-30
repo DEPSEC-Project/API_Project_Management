@@ -43,6 +43,7 @@ def return_project(proj):
        if proj in p.values():
            return p
       
+<<<<<<< HEAD
 
 
 def add_dico(dico):
@@ -60,6 +61,13 @@ def add_dico(dico):
     return return_all_proj()
     #save_json(file_path, data)
     #return jsonify(load_json(file_path)), 200
+=======
+def is_project(title):
+   for p in projects:
+       if title in p.values():
+           return True
+
+>>>>>>> 3bf328f (fix/test765765)
 
 # ------------------------------------------------------------------------------------------------------------ #
 
@@ -73,7 +81,11 @@ def get_projects():
    #data = request.get_json()
 
 
+<<<<<<< HEAD
    return return_all_proj(), 200
+=======
+   return return_all_proj()
+>>>>>>> 3bf328f (fix/test765765)
    #return jsonify({"Projects":data.get('titre')}), 200
 
 
@@ -83,6 +95,7 @@ def add_project():
        return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
 
+<<<<<<< HEAD
    data = request.get_json()
    
    if not data :
@@ -111,6 +124,38 @@ def add_project():
         
 
 
+=======
+   #data = request.json
+
+
+   if request.method == 'POST':
+       id = request.form.get("id")
+       titre = request.form.get("titre")
+       auteur = request.form.get("auteur")
+       status = request.form.get("status")
+       sbom = request.form.get("SBOM")
+
+
+       if id and titre and auteur and status and sbom:
+
+
+           if is_project(titre) != True and isinstance(id, int) and isinstance(auteur, str) and status in ["Accept","Refuse"] and sbom in ["Recup","Waiting"]:
+               format = {
+                   "id":id,
+                   "titre":titre,
+                   "auteur":auteur,
+                   "status":status,
+                   "SBOM":sbom
+               }
+               return jsonify("format",return_all_proj()), 200
+          
+       else :
+           return jsonify({'error': 'Paramètres manquants'}), 400
+   else :
+       return jsonify({'error': 'Méthode non autorisée'}), 405
+
+
+>>>>>>> 3bf328f (fix/test765765)
 @projets_bp.route('/projets', methods=['POST'])
 @limiter.limit("5 per minute") #exemple pour limiter le nombre de requetes
 def tutu():
