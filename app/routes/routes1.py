@@ -74,8 +74,8 @@ def is_project(title):
 
 @projets_bp.route('/', methods=['GET'])
 def get_projects():
-   if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-       return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
+    if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
+        return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
 
    #data = request.get_json()
@@ -91,8 +91,8 @@ def get_projects():
 
 @projets_bp.route('/', methods=['POST'])
 def add_project():
-   if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-       return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
+    if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
+        return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
 
 <<<<<<< HEAD
@@ -122,6 +122,7 @@ def add_project():
         return jsonify({'error': 'Parametres manquants'}), 400
        
         
+<<<<<<< HEAD
 
 
 =======
@@ -167,3 +168,7 @@ def tutu():
 
 
    return jsonify({"msg": "blabla"}), 401
+=======
+    except:
+        return jsonify({"Format de votre requête invalide": "Format de vos valeurs invalide"}), 203
+>>>>>>> 5553953 (fix/indentation)
