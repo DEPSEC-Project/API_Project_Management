@@ -54,8 +54,8 @@ def is_project(title):
 
 @projets_bp.route('/', methods=['GET'])
 def get_projects():
-   if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-       return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
+    if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
+        return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
     data = request.json
     if request.method == 'GET':
@@ -64,8 +64,8 @@ def get_projects():
 
 @projets_bp.route('/', methods=['POST'])
 def add_project():
-   if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-       return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
+    if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
+        return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
 
     data = request.json
 
@@ -90,15 +90,3 @@ def add_project():
         
     except:
         return jsonify({"Format de votre requête invalide": "Format de vos valeurs invalide"}), 203
-
-@test_bp.route('/projets', methods=['POST'])
-@limiter.limit("5 per minute") #exemple pour limiter le nombre de requetes
-def tutu():
-   if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-       return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
-
-
-   data = request.json
-
-
-   return jsonify({"msg": "blabla"}), 401
