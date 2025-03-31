@@ -3,5 +3,5 @@ from flask_jwt_extended import JWTManager
 
 #from depsec_models.database import db
 
-#db= depsec_models.database.db
+db = SQLAlchemy
 jwt = JWTManager()

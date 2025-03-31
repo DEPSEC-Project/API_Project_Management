@@ -1,9 +1,8 @@
 from flask import Flask, jsonify
 from app.config import *
-from app.extensions import jwt
+from app.extensions import jwt, db
 import os
 from dotenv import load_dotenv
-
 
 __version__ = "1.0.1" # géré automatiquement par la CI
 
@@ -16,9 +15,8 @@ def create_app():
    app.config.from_object(config[os.getenv("FLASK_ENV") or "development"])#en mode dev par défaut si rien de spécifié
 
 
-   #db.init_app(app)
+   db.init_app(app)
    jwt.init_app(app)
-
 
    @jwt.unauthorized_loader   # gérer le cas ou le client n'est pas authentifié
    def unauthorized_callback(callback):
