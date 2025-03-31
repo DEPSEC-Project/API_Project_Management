@@ -44,7 +44,6 @@ def return_project(proj):
            return p
       
 
-
 def add_dico(dico):
 
     for d in projects:
@@ -60,6 +59,19 @@ def add_dico(dico):
     return return_all_proj()
     #save_json(file_path, data)
     #return jsonify(load_json(file_path)), 200
+
+def del_dico(id):
+
+    try:
+        new_data = [item for item in projects if int(item.get("id")) != int(id)]
+    except ValueError:
+        return jsonify({"error": "Entrez un entier !"}), 404
+    
+    if len(new_data) == len(projects):
+        return jsonify({"error": f"Le projet avec l'id '{id}' n'existe pas !"}), 404
+
+    #return jsonify(load_json(file_path)), 200
+    return return_all_proj()
 
 # ------------------------------------------------------------------------------------------------------------ #
 
@@ -108,17 +120,7 @@ def add_project():
     else :
         return jsonify({'error': 'Parametres manquants'}), 400
        
-        
 
-
-@projets_bp.route('/projets', methods=['POST'])
-@limiter.limit("5 per minute") #exemple pour limiter le nombre de requetes
-def tutu():
-   if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-       return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
-
-
-   data = request.json
-
-
-   return jsonify({"msg": "blabla"}), 401
+@projets_bp.route("/<id>", methods=["DELETE"])
+def del_project(id):
+    return del_dico(id)
