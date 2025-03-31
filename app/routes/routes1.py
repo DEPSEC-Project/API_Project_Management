@@ -61,17 +61,19 @@ def add_dico(dico):
     #return jsonify(load_json(file_path)), 200
 
 def del_dico(id):
+    global projects
 
     try:
         new_data = [item for item in projects if int(item.get("id")) != int(id)]
-    except ValueError:
+    except :
         return jsonify({"error": "Entrez un entier !"}), 404
     
     if len(new_data) == len(projects):
         return jsonify({"error": f"Le projet avec l'id '{id}' n'existe pas !"}), 404
 
-    #return jsonify(load_json(file_path)), 200
+    projects = new_data
     return return_all_proj()
+    #return jsonify(load_json(file_path)), 200
 
 # ------------------------------------------------------------------------------------------------------------ #
 
