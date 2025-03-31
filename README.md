@@ -1,7 +1,6 @@
-
 # Project Management API
 
-### Ce micro-service va nous permettre de gérer tous les autres micro-services en les ajoutant, supprimant, avec un système de validation /refus et en se basant sur le système d'authentification.
+###### Ce micro-service va nous permettre de gérer tous les autres micro-services en les ajoutant, supprimant, avec un système de validation /refus et en se basant sur le système d'authentification.
 
 ## Arborescense
 Voici l'arborescence de notre API, avec en commentaire pour chaque dossier/fichier : 
