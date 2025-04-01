@@ -91,8 +91,8 @@ def get_projects():
     #return return_all_proj(), 200
     #return jsonify({"Projects":data.get('titre')}), 200
 
-    projects = Project.query.all()
-    return jsonify([user.to_dict() for user in users])
+    #projects = Project.query.all()
+    #return jsonify([user.to_dict() for user in users])
 
 
 @projets_bp.route('/', methods=['POST'])
