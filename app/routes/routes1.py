@@ -14,67 +14,55 @@ projets_bp = Blueprint("projets", __name__)
 limiter = Limiter(get_remote_address, default_limits=["5 per minute"])
 
 
-# ---------- Phase de test avant la BDD (comme si test.json était ce qu'on récupérait de la BDD) ------------- #
-
-
-projects = [
-   {
-       "id":1,
-       "auteur_id":3,
-       "titre":"Gestion des projets",
-       "status":"Accept",
-       "path":"/var/sui"
-   },
-   {
-       "id":2,
-       "auteur_id":8,
-       "titre":"Gestion de BDD",
-       "status":"Refuse",
-       "path":"/var/bang"
-   }
-]
-
+# ------------------------------------------------------------------------------------------------------------ #
 
 def return_all_proj():
-   return projects
+   return Project.query.all()
 
 
 def return_project(proj):
-   for p in projects:
+   for p in return_all_proj():
        if proj in p.values():
            return p
-      
+
+def return_project_by_id(id):
+    return Project.query.get(id)
 
 def add_dico(dico):
-
-    for d in projects:
-        if d["titre"] == dico["titre"]:
-            return jsonify({"error": f"Le nom de projet {d['titre']} existe deja !"}), 400
+    projects = return_all_proj()
+    if projects != []:
+        for d in projects:
+            if d.titre == dico["titre"]:
+                return jsonify({"error": f"Le nom de projet {d.titre} existe deja !"}), 400
         
     # trouve le + grand id
-    max_id = max([elem['id'] for elem in projects]) if projects else 0
+    max_id = max([p.id for p in projects]) if projects else 0
     
     dico['id'] = max_id + 1
-    projects.append(dico)
+
+    new_project = Project(
+        id = dico['id'],
+        auteur_id=dico["auteur_id"],
+        titre=dico["titre"],
+        status=dico["status"],
+        path=dico["path"]
+    )
+
+    db.session.add(new_project)
+    db.session.commit()
     
-    return return_all_proj()
-    #save_json(file_path, data)
-    #return jsonify(load_json(file_path)), 200
+    return jsonify({"message": f"Projet {new_project.titre} ajoute avec succes"}), 200
 
 def del_dico(id):
-    global projects
+    project = return_project_by_id(id)
 
-    try:
-        new_data = [item for item in projects if int(item.get("id")) != int(id)]
-    except :
-        return jsonify({"error": "Entrez un entier !"}), 404
-    
-    if len(new_data) == len(projects):
-        return jsonify({"error": f"Le projet avec l'id '{id}' n'existe pas !"}), 404
+    if not project:
+        return jsonify({"error": f"Projet avec l'ID {id} non trouve"}), 404
 
-    projects = new_data
-    return return_all_proj()
-    #return jsonify(load_json(file_path)), 200
+    db.session.delete(project)
+    db.session.commit()
+
+    return jsonify({"message": f"Projet avec l'ID {id} supprime avec succes"}), 200
 
 # ------------------------------------------------------------------------------------------------------------ #
 
@@ -82,49 +70,46 @@ def del_dico(id):
 @projets_bp.route('/', methods=['GET'])
 def get_projects():
     if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-        return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
+        return jsonify({"msg": "Token invalide / Utilisateur non autorise"}), 401
+    
+    return jsonify([project.to_dict() for project in Project.query.all()])
 
-
-    #data = request.get_json()
-
-
-    #return return_all_proj(), 200
-    #return jsonify({"Projects":data.get('titre')}), 200
-
-    projects = Project.query.all()
-    return jsonify([project.to_dict() for project in projects])
-
+@projets_bp.route('/<int:project_id>', methods=['GET'])
+def get_project_by_id(project_id):
+    project = Project.query.get(project_id)
+    if not project:
+        return jsonify({'error': 'Projet non trouvé'}), 404
+    return jsonify(project.to_dict()), 200
 
 @projets_bp.route('/', methods=['POST'])
 def add_project():
-    if verify_token() == False and current_app.config["FLASK_ENV"] !="development" : #verifier que le token est valide ( a mettre dans chaque route) et qu'on est pas en environnement de dev
-        return jsonify({"msg": "Token invalide / Utilisateur non autorisé"}), 401
-
+    if verify_token() == False and current_app.config["FLASK_ENV"] != "development":
+        return jsonify({"msg": "Token invalide / Utilisateur non autorise"}), 401
 
     data = request.get_json()
 
-    if not data :
-        return jsonify({"error": "Le fomat de vos donnees n'est pas bon !!"}), 400
+    if not data:
+        return jsonify({"error": "Le format de vos donnees n'est pas bon !!"}), 400
 
-    if data.get("titre") and data.get("auteur_id") and data.get("status") and data.get("path"):
-        titre = data.get("titre")
-        auteur_id = data.get("auteur_id")
-        status = data.get("status")
-        path = data.get("path")
-
-        if isinstance(auteur_id, int) and status in ["Accept","Refuse"]:
-            format = {
-                "id":0,
-                "auteur":auteur_id,
-                "titre":titre,
-                "status":status,
-                "path":path
-            }
-            return add_dico(format)
-        else :
-            return jsonify({'error': 'Parametres aux mauvais formats !'}), 400
-    else :
+    required_fields = ["titre", "auteur_id", "status", "path"]
+    if not all(field in data for field in required_fields):
         return jsonify({'error': 'Parametres manquants'}), 400
+
+    titre = data["titre"]
+    auteur_id = data["auteur_id"]
+    status = data["status"]
+    path = data["path"]
+
+    if isinstance(auteur_id, int) and status in ["Accept", "Refuse"]:
+        project_data = {
+            "auteur_id": auteur_id,
+            "titre": titre,
+            "status": status,
+            "path": path
+        }
+        return add_dico(project_data)
+    else:
+        return jsonify({'error': 'Parametres aux mauvais formats !'}), 400
        
 
 @projets_bp.route("/<id>", methods=["DELETE"])
