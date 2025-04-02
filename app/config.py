@@ -9,7 +9,7 @@ class Config: # config par défaut
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'enormemotdepasse')
     PORT=os.getenv("FLASK_PORT",5000)
 
-class DevelopmentConfig(Config): 
+class DevelopmentConfig(Config):
     FLASK_ENV = 'development'
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL', 'postgresql://user:password@db:5432/basededev')
