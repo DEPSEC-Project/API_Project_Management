@@ -1,4 +1,3 @@
-import requests
 from flask import Blueprint, current_app, json, request, jsonify
 from flask_jwt_extended import create_access_token
 from app.extensions import db
@@ -8,6 +7,7 @@ import re
 from app.services.auth import verify_token
 from app.extensions import db
 from depsec_db.models import Project, User
+import requests
 #from depsec_models.models import * #import des modèles depuis le package
 
 
