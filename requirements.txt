@@ -1,3 +1,4 @@
+pip==20.3.4
 flask
 flask-limiter
 Flask-SQLAlchemy
@@ -6,3 +7,7 @@ pytest
 dotenv
 requests
 python-semantic-release
+setuptools
+flask_migrate
+psycopg2-binary
+git+https://github.com/DEPSEC-Project/DB-Management.git@main
