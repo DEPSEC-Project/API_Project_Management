@@ -6,7 +6,7 @@ from flask_limiter.util import get_remote_address
 import re
 from app.services.auth import verify_token
 from app.extensions import db
-from depsec_db import models
+from depsec_db.models import Project
 #from depsec_models.models import * #import des modèles depuis le package
 
 
@@ -20,15 +20,15 @@ limiter = Limiter(get_remote_address, default_limits=["5 per minute"])
 projects = [
    {
        "id":1,
+       "auteur_id":3,
        "titre":"Gestion des projets",
-       "auteur":"Solayman",
        "status":"Accept",
        "path":"/var/sui"
    },
    {
        "id":2,
+       "auteur_id":8,
        "titre":"Gestion de BDD",
-       "auteur":"Pierrot la pinto de la mañana",
        "status":"Refuse",
        "path":"/var/bang"
    }
@@ -91,8 +91,8 @@ def get_projects():
     #return return_all_proj(), 200
     #return jsonify({"Projects":data.get('titre')}), 200
 
-    #projects = Project.query.all()
-    #return jsonify([user.to_dict() for user in users])
+    projects = Project.query.all()
+    return jsonify([project.to_dict() for project in projects])
 
 
 @projets_bp.route('/', methods=['POST'])
@@ -106,17 +106,17 @@ def add_project():
     if not data :
         return jsonify({"error": "Le fomat de vos donnees n'est pas bon !!"}), 400
 
-    if data.get("titre") and data.get("auteur") and data.get("status") and data.get("path"):
+    if data.get("titre") and data.get("auteur_id") and data.get("status") and data.get("path"):
         titre = data.get("titre")
-        auteur = data.get("auteur")
+        auteur_id = data.get("auteur_id")
         status = data.get("status")
         path = data.get("path")
 
-        if isinstance(auteur, str) and status in ["Accept","Refuse"]:
+        if isinstance(auteur_id, int) and status in ["Accept","Refuse"]:
             format = {
                 "id":0,
+                "auteur":auteur_id,
                 "titre":titre,
-                "auteur":auteur,
                 "status":status,
                 "path":path
             }

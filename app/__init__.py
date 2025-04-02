@@ -4,7 +4,7 @@ from app.extensions import jwt, db
 import os
 from dotenv import load_dotenv
 
-__version__ = "1.0.1" # géré automatiquement par la CI
+__version__ = "0.1.1" # géré automatiquement par la CI
 
 
 load_dotenv(".env")
