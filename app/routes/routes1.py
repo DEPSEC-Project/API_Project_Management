@@ -23,14 +23,14 @@ projects = [
        "titre":"Gestion des projets",
        "auteur":"Solayman",
        "status":"Accept",
-       "SBOM":"Recup"
+       "path":"/var/sui"
    },
    {
        "id":2,
        "titre":"Gestion de BDD",
        "auteur":"Pierrot la pinto de la mañana",
        "status":"Refuse",
-       "SBOM":"Waiting"
+       "path":"/var/bang"
    }
 ]
 
@@ -106,19 +106,19 @@ def add_project():
     if not data :
         return jsonify({"error": "Le fomat de vos donnees n'est pas bon !!"}), 400
 
-    if data.get("titre") and data.get("auteur") and data.get("status") and data.get("SBOM"):
+    if data.get("titre") and data.get("auteur") and data.get("status") and data.get("path"):
         titre = data.get("titre")
         auteur = data.get("auteur")
         status = data.get("status")
-        sbom = data.get("SBOM")
+        path = data.get("path")
 
-        if isinstance(auteur, str) and status in ["Accept","Refuse"] and sbom in ["Recup","Waiting"]:
+        if isinstance(auteur, str) and status in ["Accept","Refuse"]:
             format = {
                 "id":0,
                 "titre":titre,
                 "auteur":auteur,
                 "status":status,
-                "SBOM":sbom
+                "path":path
             }
             return add_dico(format)
         else :
