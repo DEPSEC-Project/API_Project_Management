@@ -1,3 +1,4 @@
+from fastapi import requests
 from flask import Blueprint, current_app, json, request, jsonify
 from flask_jwt_extended import create_access_token
 from app.extensions import db
@@ -6,7 +7,7 @@ from flask_limiter.util import get_remote_address
 import re
 from app.services.auth import verify_token
 from app.extensions import db
-from depsec_db.models import Project
+from depsec_db.models import Project, User
 #from depsec_models.models import * #import des modèles depuis le package
 
 
@@ -50,7 +51,9 @@ def add_dico(dico):
 
     db.session.add(new_project)
     db.session.commit()
-    
+
+    ### requête avec la table SBOM pour créer un SBOM ###
+    requests.post("http://jeanclaudenunes.online:5010/", headers=jsonify(new_project.to_dict()))
     return jsonify({"message": f"Projet {new_project.titre} ajoute avec succes"}), 200
 
 def del_dico(id):
@@ -99,6 +102,11 @@ def add_project():
     auteur_id = data["auteur_id"]
     status = data["status"]
     path = data["path"]
+
+    # vérifie que l'utilisateur existe dans la table User
+    user = User.query.get(auteur_id)
+    if not user:
+        return jsonify({"error": "L'utilisateur spécifié n'existe pas"}), 404
 
     if isinstance(auteur_id, int) and status in ["Accept", "Refuse"]:
         project_data = {
