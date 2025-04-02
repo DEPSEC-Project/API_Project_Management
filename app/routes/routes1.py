@@ -1,4 +1,4 @@
-from fastapi import requests
+import requests
 from flask import Blueprint, current_app, json, request, jsonify
 from flask_jwt_extended import create_access_token
 from app.extensions import db
