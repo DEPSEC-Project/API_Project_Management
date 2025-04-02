@@ -53,7 +53,7 @@ def add_dico(dico):
     db.session.commit()
 
     ### requête avec la table SBOM pour créer un SBOM ###
-    requests.post("http://jeanclaudenunes.online:5010/", headers=jsonify(new_project.to_dict()))
+    requests.post("http://jeanclaudenunes.online:5010/", json=new_project.to_dict())
     return jsonify({"message": f"Projet {new_project.titre} ajoute avec succes"}), 200
 
 def del_dico(id):
