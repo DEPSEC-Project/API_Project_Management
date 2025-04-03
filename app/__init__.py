@@ -3,6 +3,7 @@ from app.config import *
 from app.extensions import jwt, db
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 __version__ = "0.1.1" # géré automatiquement par la CI
 
@@ -10,8 +11,9 @@ __version__ = "0.1.1" # géré automatiquement par la CI
 load_dotenv(".env")
 def create_app():
    app = Flask(__name__)
-
-
+   
+   CORS(app, resources={r"/*": {"origins": "*"}})
+   
    app.config.from_object(config[os.getenv("FLASK_ENV") or "development"])#en mode dev par défaut si rien de spécifié
 
 

@@ -10,5 +10,5 @@ python-semantic-release
 setuptools
 flask_migrate
 psycopg2-binary
-fastapi
+flask-cors
 git+https://github.com/DEPSEC-Project/DB-Management.git@main

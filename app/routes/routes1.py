@@ -1,3 +1,6 @@
+import os
+import json
+from urllib import response
 from flask import Blueprint, current_app, json, request, jsonify
 from flask_jwt_extended import create_access_token
 from app.extensions import db
@@ -6,8 +9,9 @@ from flask_limiter.util import get_remote_address
 import re
 from app.services.auth import verify_token
 from app.extensions import db
-from depsec_db.models import Project, User
+from depsec_db.models import Project, User, SBOM
 import requests
+from requests.structures import CaseInsensitiveDict
 #from depsec_models.models import * #import des modèles depuis le package
 
 
@@ -41,6 +45,17 @@ def add_dico(dico):
     
     dico['id'] = max_id + 1
 
+    if Project.query.filter((Project.titre == dico["titre"]) | (Project.path == dico["path"])).first():
+        return jsonify({"error": f"Un projet avec ce titre ou ce chemin existe deja !"}), 400
+
+    # Génère un chemin spécifique en fonction du titre du projet
+    safe_title =dico['titre'].replace(" ", "_").lower()  # Ex: "Mon Projet" → "mon_projet"
+    project_path = os.path.join(dico['path'], safe_title)
+
+    # Vérifie si le dossier existe, sinon le créer
+    if not os.path.exists(project_path):
+        os.makedirs(project_path)
+
     new_project = Project(
         id = dico['id'],
         auteur_id=dico["auteur_id"],
@@ -49,11 +64,28 @@ def add_dico(dico):
         path=dico["path"]
     )
 
+    project_for_sbom = {
+            "id": dico['id'],
+            "auteur_id": dico['auteur_id'],
+            "titre": dico['titre'],
+            "status": dico['status'],
+            "path": dico['path']
+    }
+
+
     db.session.add(new_project)
     db.session.commit()
 
+
+    project = Project.query.filter_by(id=dico['id']).first()
     ### requête avec la table SBOM pour créer un SBOM ###
-    requests.post("http://jeanclaudenunes.online:5010/", json=new_project.to_dict())
+    data = json.dumps({"id":project.id})
+    headers = CaseInsensitiveDict()
+    headers["Content-Type"] = "application/json"
+    sbom_response = requests.post("http://depsec.jeanclaudenunes.online:5010/",headers=headers, data=data, timeout=5)
+    sbom_response.raise_for_status()
+
+    
     return jsonify({"message": f"Projet {new_project.titre} ajoute avec succes"}), 200
 
 def del_dico(id):
@@ -61,12 +93,20 @@ def del_dico(id):
 
     if not project:
         return jsonify({"error": f"Projet avec l'ID {id} non trouve"}), 404
+    
 
-    db.session.delete(project)
-    db.session.commit()
+    try:
+        db.session.delete(project)
+        db.session.commit()
 
-    return jsonify({"message": f"Projet avec l'ID {id} supprime avec succes"}), 200
-
+        return jsonify({"message": f"Projet avec l'ID {id} supprime avec succes"}), 200
+    except:
+        db.session.rollback()
+        sbom_response = requests.delete(f"http://depsec.jeanclaudenunes.online:5010/sbom/{id}", timeout=5)
+        sbom_response.raise_for_status()
+        db.session.delete(project)
+        db.session.commit()
+        return jsonify({"message": f"Projet avec l'ID {id} supprime avec succes"}), 200
 # ------------------------------------------------------------------------------------------------------------ #
 
 
@@ -81,7 +121,7 @@ def get_projects():
 def get_project_by_id(project_id):
     project = Project.query.get(project_id)
     if not project:
-        return jsonify({'error': 'Projet non trouvé'}), 404
+        return jsonify({'error': 'Projet non trouve !'}), 404
     return jsonify(project.to_dict()), 200
 
 @projets_bp.route('/', methods=['POST'])
